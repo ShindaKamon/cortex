@@ -1,0 +1,27 @@
+# Fork-only: build cortex.exe and cortex-mcp.exe for Windows x86_64 (MSVC).
+name: Windows CLI+MCP build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: cargo build --locked --release -p cortex-cli -p cortex-mcp
+      - name: Stage
+        shell: bash
+        run: |
+          mkdir stage
+          cp target/release/cortex.exe target/release/cortex-mcp.exe stage/
+          ls -l stage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-windows-x86_64
+          path: stage/*.exe
